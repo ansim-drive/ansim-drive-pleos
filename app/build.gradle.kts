@@ -17,7 +17,9 @@ android {
         versionName = "0.1"
 
         // 에뮬레이터 위치가 안 바뀔 때 assets/demo_route.json 재생. ./gradlew assembleDebug -PdemoMode=true
-        buildConfigField("boolean", "DEMO_MODE", (project.findProperty("demoMode") ?: "false").toString())
+        // 컴파일 타임 상수면 증분 빌드에서 이전 값이 남으므로 parseBoolean으로 감싼다.
+        val demoMode = (project.findProperty("demoMode") ?: "false").toString()
+        buildConfigField("boolean", "DEMO_MODE", "Boolean.parseBoolean(\"$demoMode\")")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

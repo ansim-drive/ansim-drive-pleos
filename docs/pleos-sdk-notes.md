@@ -118,7 +118,8 @@ BookmarkInfo(latitude: Double, longitude: Double, displayLatitude: Double?, disp
              name: String?, poiId: String?, poiSubId: String?, address: String?, category: BookmarkType?, poiProvider: String?)
 // BookmarkType: HOME, OFFICE, EV_CHARGING_STATION, DEFAULT  → 집 = category == HOME
 RouteStateInfo(termsAgreement: Boolean, naviMode: NaviMode, isRouting: Boolean, routeOption: RouteOption, ...)
-// NaviMode: NOT_WORKING, SAFE_GUIDING, ROUTE_GUIDING, SIMULATION_GUIDING → 경로 활성 = isRouting
+// NaviMode: NOT_WORKING, SAFE_GUIDING, ROUTE_GUIDING, SIMULATION_GUIDING
+// 경로 안내 중 판정 = naviMode == ROUTE_GUIDING (isRouting은 안내 중에도 false로 옴, 에뮬레이터 확인)
 ```
 
 `RouteInfo` 생성 (navi 샘플 그대로, 나머지 인자는 기본값):
@@ -138,8 +139,19 @@ RouteInfo(
 
 특별한 meta-data·Client ID 불필요 (Client ID/Secret은 Pleos TTS/STT 등 서버 연동 SDK 전용). 일반 `MAIN`/`LAUNCHER` intent-filter로 런처에 뜬다. NaviHelper AAR이 `<queries>`(`ai.pleos.playground.intent.action.NAVI_START`)를 자체 병합한다.
 
+에뮬레이터에서 확인한 동작:
+- HOME 북마크를 등록하지 않으면 `category=HOME`, 좌표 `(0.0, 0.0)`인 빈 항목이 온다 → 미등록으로 처리.
+- `requestRoute`는 `poiId=""`(좌표만)로도 동작한다. 지도 앱이 앞으로 나오고 경로 안내가 자동 시작된다.
+
 ## 6. 에뮬레이터 (Pleos Connect v2.1.0)
 
 - Virtual Console: `adb forward tcp:8088 tcp:8088` → http://127.0.0.1:8088/ . Motion 도메인에서 Gear(P/R/N/D), Brake Pedal(0–100%) 변경 가능. Exterior Lights Mode(Off/Auto/Tail/Low beam).
-- 차량 속도 카드는 문서에 없음 → 속도 시뮬레이션 방법은 에뮬레이터에서 직접 확인 필요.
+- Virtual Console은 HTTP API로도 조작된다 (브라우저 세션이 살아 있어야 함: `POST /browser/session?client=<id>`를 1초마다):
+  `PUT /vehicle/gear?gear=Park|Reverse|Neutral|Drive`, `PUT /vehicle/controls?speed=<km/h>&accelerator=<%>&brake=<%>`.
+  속도·브레이크 변경이 `PERF_VEHICLE_SPEED`와 Vehicle SDK Brake에 반영되는 것을 확인했다.
+- 에뮬레이터는 user 빌드라 `adb shell cmd car_service` 값 주입이 막혀 있다.
+- **TTS**: 유일한 엔진(`ai.pleos.playground.caas` SpeechService)이 intent-filter에 `CATEGORY_DEFAULT`가 없어 Android 표준 `TextToSpeech`가 엔진을 찾지 못한다 (`engines=[]`, init -1).
+- **STT**: `ai.umos.ambientai` RecognitionService가 잡히지만 `startListening` 후 콜백이 오지 않는다 (마이크 미연결 상태에서 확인).
+- 주행 중(D)에는 시스템 권한 다이얼로그가 차단된다 → 권한은 P에서 받는다. 앱 Activity는 `distractionOptimized` 메타데이터로 주행 중에도 표시된다.
+- 백그라운드로 가면 앱 프로세스가 동결(freezer)되어 Car API 콜백이 쌓였다가 앞으로 나올 때 한꺼번에 전달된다.
 - 설치된 서비스: `ai.pleos.playground.service.vehicle`, `ai.pleos.playground.service.navi`, 지도 앱 `ai.umos.maps.android.navigation.app`.
