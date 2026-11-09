@@ -19,8 +19,8 @@
 |---|---|
 | 언어 | Kotlin |
 | minSdk | 28 (Pleos 요구사항, 낮추지 말 것) |
-| targetSdk / compileSdk | 34 |
-| Gradle | 8.x |
+| targetSdk / compileSdk | 35 (Pleos 샘플 기준) |
+| Gradle / AGP / Kotlin / JDK | wrapper 8.10.2 / 8.8.2 / 2.0.0 / 17 (Pleos 샘플 기준) |
 | UI | Android View + ViewBinding (Compose 금지 — 에뮬레이터 호환성·디버깅 단순화) |
 | 테스트 기기 | Pleos Connect Emulator v2.1.0 (AVD, Automotive, Cold boot) |
 | 차량 데이터 | Pleos Vehicle SDK(Brake, Light 등) + AAOS 표준 Car API(`VehiclePropertyIds.PERF_VEHICLE_SPEED`, `GEAR_SELECTION`) |
@@ -34,6 +34,8 @@
 ## 4. 공식 문서 (코드 쓰기 전에 반드시 읽을 것)
 
 Pleos SDK는 학습 데이터에 없을 가능성이 높다. **추측으로 API를 쓰지 말고** 아래 문서를 WebFetch로 읽은 뒤 작성한다. 문서에 없는 메서드·클래스는 만들어 내지 않는다.
+
+> 문서 사이트의 API 레퍼런스는 JS 렌더링이라 WebFetch로 읽히지 않는다. 확인된 SDK 사용법은 `docs/pleos-sdk-notes.md`에 정리돼 있으니 그것을 먼저 보고, 세부 API는 공식 샘플 저장소(`~/dev/pleos-samples/`)와 AAR 시그니처로 확인한다.
 
 - 개발 환경/에뮬레이터: https://document.pleos.ai/en/docs/connect/guide/getting-started/application-development/setup-connect-sdk-emulator
 - 프로젝트·SDK 접근: https://document.pleos.ai/en/docs/pleos-only/create-my-project
