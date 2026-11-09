@@ -27,6 +27,8 @@ import com.ansimdrive.pleos.vehicle.HardBrakeDetector
 import com.ansimdrive.pleos.vehicle.PleosVehicleRepo
 import com.ansimdrive.pleos.voice.VoiceAssistant
 import com.ansimdrive.pleos.voice.VoiceAssistant.Answer
+import com.ansimdrive.pleos.voice.VoiceLine
+import com.ansimdrive.pleos.voice.VoiceSettings
 import java.util.Calendar
 
 /** 기어 상태에 따라 DrivingFragment / ParkedFragment를 전환하고, 주행 중 헤맴을 감지한다. */
@@ -65,13 +67,18 @@ class MainActivity : AppCompatActivity() {
         vehicleRepo = PleosVehicleRepo(this, ::onBrake, ::onHeadlight)
         navi = NaviHelperRepo(this)
         location = if (BuildConfig.DEMO_MODE) DemoLocationSource(this) else AutoLocationSource(this, navi)
-        voice = VoiceAssistant(this)
+        voice = VoiceAssistant(this, VoiceSettings(this))
 
         if (savedInstanceState == null) show(ParkedFragment.newInstance(stats))
 
         // 권한 다이얼로그는 주행 중(UX 제한)에는 차단되므로 정차 중 첫 실행에서 받는다.
         val missing = RUNTIME_PERMISSIONS.filterNot(::granted)
         if (missing.isEmpty()) startSources() else permissionRequest.launch(missing.toTypedArray())
+
+        // 음성 테스트용(디버그 빌드만): adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("debug_ask", false)) {
+            binding.root.postDelayed(::askRouteHome, 2_000)
+        }
     }
 
     override fun onDestroy() {
@@ -134,9 +141,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askRouteHome() {
-        val question = getString(R.string.ask_route_home)
-        drivingFragment()?.showQuestion(question)
-        voice.ask(question) { answer ->
+        drivingFragment()?.showQuestion(getString(VoiceLine.ASK_ROUTE_HOME.text))
+        voice.ask(VoiceLine.ASK_ROUTE_HOME) { answer ->
             when (answer) {
                 Answer.YES -> onAnswer(true)
                 Answer.NO -> onAnswer(false)
@@ -149,11 +155,11 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "Answer: ${if (yes) "yes" else "no"}")
         drivingFragment()?.clearQuestion()
         val reply = when {
-            !yes -> R.string.declined
-            navi.routeHome() -> R.string.routing_home
-            else -> R.string.no_home
+            !yes -> VoiceLine.DECLINED
+            navi.routeHome() -> VoiceLine.ROUTING_HOME
+            else -> VoiceLine.NO_HOME
         }
-        voice.speak(getString(reply))
+        voice.say(reply)
     }
 
     // ---- 기록: 주행거리·급제동·야간 ----
