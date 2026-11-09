@@ -92,6 +92,7 @@ app/src/main/java/com/ansimdrive/pleos/
 
 ## 9. 작업 방식
 
+- 모든 보고, 설명, 질문은 한국어로 쓴다. 코드·커밋 메시지·파일명은 영어 유지.
 - 작업 시작 시 `git status`로 깨끗한지 확인. 기능 하나 끝날 때마다 커밋. 커밋 메시지는 영어 conventional commits (`feat:`, `fix:`, `chore:`, `docs:`).
 - 브랜치는 `main` 하나만 쓴다 (혼자, 6일). 영상 촬영 시점에 `v0.1-submission` 태그.
 - 빌드는 반드시 `./gradlew assembleDebug`로 검증한 뒤 커밋. 빌드 실패 상태로 커밋하지 않는다.
