@@ -1,0 +1,54 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.ansimdrive.pleos"
+    compileSdk = 35
+
+    useLibrary("android.car")
+
+    defaultConfig {
+        applicationId = "com.ansimdrive.pleos"
+        minSdk = 28
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1"
+
+        // 에뮬레이터 위치가 안 바뀔 때 assets/demo_route.json 재생. ./gradlew assembleDebug -PdemoMode=true
+        buildConfigField("boolean", "DEMO_MODE", (project.findProperty("demoMode") ?: "false").toString())
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation("ai.pleos.playground:Vehicle:2.3.2")
+    implementation("ai.pleos.playground:NaviHelper:3.0.5")
+
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+
+    testImplementation("junit:junit:4.13.2")
+}
