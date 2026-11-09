@@ -40,6 +40,6 @@ adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true 
 adb logcat -s AnsimDrive   # "Say ASK_ROUTE_HOME (... recording=true)" → "Recording done"
 ```
 
-## 저장소에 올리기 전에
+## 저장소에 올리지 않음
 
-녹음 파일은 가족의 실제 목소리라 GitHub에 올리면 누구나 들을 수 있다. 공개 저장소에 넣을지, `.gitignore`에 `app/src/main/res/raw/voice_*`를 추가해 로컬 빌드에만 쓸지 정하고 넣는다.
+녹음 파일은 가족의 실제 목소리라 개인정보로 다룬다. `.gitignore`에 `app/src/main/res/raw/voice_*`가 들어 있어 커밋되지 않으며, 로컬 빌드에만 포함된다. 저장소를 받아 빌드하면 녹음 없이 화면 문구로 안내한다.

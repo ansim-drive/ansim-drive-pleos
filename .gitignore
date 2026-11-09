@@ -15,3 +15,6 @@ local.properties
 keystore.properties
 *.jks
 *.keystore
+
+# Family voice recordings: personal data, local builds only (docs/voice-lines.md)
+app/src/main/res/raw/voice_*
