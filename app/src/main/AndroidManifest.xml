@@ -5,6 +5,13 @@
         android:name="android.hardware.type.automotive"
         android:required="true" />
 
+    <!-- AAOS Car API: 속도(dangerous, 런타임 요청)·기어 -->
+    <uses-permission android:name="android.car.permission.CAR_SPEED" />
+    <uses-permission android:name="android.car.permission.CAR_POWERTRAIN" />
+    <!-- Pleos Vehicle SDK: 브레이크·라이트 (normal, 선언만으로 부여) -->
+    <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />
+    <uses-permission android:name="pleos.car.permission.CAR_LIGHTS" />
+
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"

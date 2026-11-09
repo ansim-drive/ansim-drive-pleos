@@ -11,6 +11,6 @@
         android:layout_gravity="center"
         android:text="@string/driving"
         android:textColor="@color/text_main"
-        android:textSize="72sp"
+        android:textSize="120sp"
         android:textStyle="bold" />
 </FrameLayout>

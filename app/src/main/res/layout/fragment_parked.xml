@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="@string/parked_title"
         android:textColor="@color/text_main"
-        android:textSize="56sp"
+        android:textSize="80sp"
         android:textStyle="bold" />
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:lineSpacingExtra="12dp"
+        android:lineSpacingExtra="20dp"
         android:textColor="@color/text_main"
-        android:textSize="40sp" />
+        android:textSize="60sp" />
 </LinearLayout>
