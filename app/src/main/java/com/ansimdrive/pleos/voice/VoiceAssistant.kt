@@ -2,20 +2,16 @@ package com.ansimdrive.pleos.voice
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
+import com.ansimdrive.pleos.BuildConfig
 import com.ansimdrive.pleos.TAG
 import java.util.Locale
 
@@ -25,6 +21,9 @@ import java.util.Locale
  *
  * 말하기 우선순위는 [VoiceSettings.mode]를 따른다. TTS 엔진이 없으면(Pleos 에뮬레이터)
  * "가족 목소리 안내" 녹음(res/raw)을 재생하고, 녹음도 없으면 소리 없이 넘어간다(화면 문구만).
+ *
+ * 듣기 엔진은 BuildConfig.STT_ENGINE으로 고른다: "vosk"(에뮬레이터용, 기기 내 인식) / "system"(실차용).
+ * Vosk 모델이 assets에 없으면 system으로 대신한다.
  */
 class VoiceAssistant(private val context: Context, private val settings: VoiceSettings) {
 
@@ -32,7 +31,12 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
 
     private val main = Handler(Looper.getMainLooper())
     private var ttsReady = false
-    private var recognizer: SpeechRecognizer? = null
+    private val stt: SpeechInput =
+        if (BuildConfig.STT_ENGINE == "vosk" && VoskSpeechInput.isModelBundled(context)) {
+            VoskSpeechInput(context)
+        } else {
+            SystemSpeechInput(context)
+        }.also { Log.i(TAG, "STT engine: ${it.name} (STT_ENGINE=${BuildConfig.STT_ENGINE})") }
     private val pendingDone = mutableMapOf<String, () -> Unit>()
     private val audio = context.getSystemService(AudioManager::class.java)
     private var player: MediaPlayer? = null
@@ -133,12 +137,7 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
     }
 
     private fun listen(onAnswer: (Answer) -> Unit) {
-        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-            Log.w(TAG, "STT unavailable")
-            onAnswer(Answer.UNKNOWN)
-            return
-        }
-        // 인식 서비스가 아무 콜백도 주지 않는 경우가 있어(에뮬레이터) 시간 제한을 둔다.
+        // 인식 엔진이 아무 콜백도 주지 않는 경우가 있어(에뮬레이터) 시간 제한을 둔다.
         var answered = false
         val answerOnce = { a: Answer ->
             if (!answered) {
@@ -149,54 +148,29 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
         }
         main.postDelayed({
             Log.w(TAG, "STT timeout")
-            recognizer?.cancel()
+            stt.cancel()
             answerOnce(Answer.UNKNOWN)
         }, LISTEN_TIMEOUT, LISTEN_TIMEOUT_MS)
 
-        val r = recognizer ?: SpeechRecognizer.createSpeechRecognizer(context).also { recognizer = it }
-        r.setRecognitionListener(object : RecognitionListener {
-            override fun onResults(results: Bundle) {
-                val heard = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).orEmpty()
-                val answer = parse(heard)
-                Log.i(TAG, "STT heard=$heard -> $answer")
-                answerOnce(answer)
-            }
-
-            override fun onError(error: Int) {
-                Log.w(TAG, "STT error $error")
-                answerOnce(Answer.UNKNOWN)
-            }
-
-            override fun onReadyForSpeech(params: Bundle?) {
-                Log.d(TAG, "STT listening")
-            }
-            override fun onBeginningOfSpeech() {}
-            override fun onRmsChanged(rmsdB: Float) {}
-            override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() {}
-            override fun onPartialResults(partialResults: Bundle?) {}
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
-        Log.i(TAG, "STT start")
-        r.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-        })
+        Log.i(TAG, "STT start (${stt.name})")
+        stt.listen { heard ->
+            val answer = parse(heard)
+            Log.i(TAG, "STT heard=$heard -> $answer")
+            if (answer != Answer.UNKNOWN || heard.isEmpty()) answerOnce(answer)
+        }
     }
 
     fun cancel() {
         main.removeCallbacksAndMessages(LISTEN_TIMEOUT)
         stopPlayer()
-        recognizer?.cancel()
+        stt.cancel()
         if (ttsReady) tts.stop()
         pendingDone.clear()
     }
 
     fun release() {
         cancel()
-        recognizer?.destroy()
-        recognizer = null
+        stt.release()
         tts.shutdown()
     }
 

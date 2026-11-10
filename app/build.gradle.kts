@@ -24,9 +24,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // 음성 인식 엔진: vosk(기기 내 인식, 에뮬레이터용) / system(Android SpeechRecognizer, 실차용). -PsttEngine=...
+    // 문자열 상수는 증분 빌드에서 인라인된 옛 값이 남으므로 String.valueOf로 감싼다.
+    val sttEngine = project.findProperty("sttEngine")?.toString()
     buildTypes {
+        debug {
+            buildConfigField("String", "STT_ENGINE", "String.valueOf(\"${sttEngine ?: "vosk"}\")")
+        }
         release {
             isMinifyEnabled = false
+            buildConfigField("String", "STT_ENGINE", "String.valueOf(\"${sttEngine ?: "system"}\")")
         }
     }
 
@@ -46,6 +53,10 @@ android {
 dependencies {
     implementation("ai.pleos.playground:Vehicle:2.3.2")
     implementation("ai.pleos.playground:NaviHelper:3.0.5")
+
+    // 기기 내 음성 인식 (에뮬레이터용). 모델은 assets/vosk-model-ko (저장소 미포함, docs/voice-lines.md)
+    implementation("com.alphacephei:vosk-android:0.3.75")
+    implementation("net.java.dev.jna:jna:5.18.1@aar")
 
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")

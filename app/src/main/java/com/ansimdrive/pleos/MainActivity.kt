@@ -26,9 +26,11 @@ import com.ansimdrive.pleos.vehicle.CarPropertyRepo
 import com.ansimdrive.pleos.vehicle.HardBrakeDetector
 import com.ansimdrive.pleos.vehicle.PleosVehicleRepo
 import com.ansimdrive.pleos.voice.VoiceAssistant
+import com.ansimdrive.pleos.voice.MicCheck
 import com.ansimdrive.pleos.voice.VoiceAssistant.Answer
 import com.ansimdrive.pleos.voice.VoiceLine
 import com.ansimdrive.pleos.voice.VoiceSettings
+import com.ansimdrive.pleos.voice.VoskSpeechInput
 import java.util.Calendar
 
 /** 기어 상태에 따라 DrivingFragment / ParkedFragment를 전환하고, 주행 중 헤맴을 감지한다. */
@@ -77,8 +79,15 @@ class MainActivity : AppCompatActivity() {
         if (missing.isEmpty()) startSources() else permissionRequest.launch(missing.toTypedArray())
 
         // 음성 테스트용(디버그 빌드만): adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true
+        if (BuildConfig.DEBUG && intent.hasExtra("debug_vosk_grammar")) {
+            VoskSpeechInput.useGrammar = intent.getBooleanExtra("debug_vosk_grammar", true)
+        }
         if (BuildConfig.DEBUG && intent.getBooleanExtra("debug_ask", false)) {
-            binding.root.postDelayed(::askRouteHome, 2_000)
+            binding.root.postDelayed(::askRouteHome, 4_000)   // 음성 인식 모델 로딩(약 2.5초) 뒤
+        }
+        // 마이크 점검(디버그 빌드만): --ei debug_mic <3초 구간 수>
+        if (BuildConfig.DEBUG && intent.getIntExtra("debug_mic", 0) > 0) {
+            MicCheck.run(this, intent.getIntExtra("debug_mic", 0))
         }
     }
 
