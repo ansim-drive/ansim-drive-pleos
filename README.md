@@ -35,6 +35,7 @@ adb logcat -s AnsimDrive
 - 기어·속도·브레이크는 Virtual Console(`adb forward tcp:8088 tcp:8088` → http://127.0.0.1:8088/)에서 바꿉니다.
 - 단위 테스트: `./gradlew testDebugUnitTest` (geohash, 헤맴 감지, 데모 경로 트리거 시간)
 - 음성만 빠르게 확인(디버그 빌드): `adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true`
+- 음성 인식 엔진: debug 빌드는 기기 내 Vosk(모델 별도 설치, [docs/voice-lines.md](docs/voice-lines.md)), release는 Android 표준 인식. `-PsttEngine=vosk|system`으로 바꿀 수 있습니다.
 
 ## 가족 목소리 안내
 
@@ -52,7 +53,10 @@ app/src/main/java/com/ansimdrive/pleos/
   vehicle/HardBrakeDetector.kt 급제동 (브레이크 ON + 초당 11km/h 이상 감속)
   location/LocationSource.kt   NaviHelper / LocationManager / 데모 위치 소스
   detection/                   Geohash, WanderingDetector, DetectionConfig(임계값 모음)
-  voice/VoiceAssistant.kt      Android 표준 TTS + STT, 가족 목소리 녹음 재생
+  voice/VoiceAssistant.kt      TTS·녹음 재생, 대답 판정
+  voice/SpeechInput.kt         듣기 엔진 인터페이스 + Android SpeechRecognizer(실차용)
+  voice/VoskSpeechInput.kt     Vosk 기기 내 인식(에뮬레이터용)
+  voice/MicCheck.kt            디버그 전용 마이크 점검
   voice/VoiceLine.kt           앱이 말하는 문장 목록 (문자열 ↔ 녹음 파일)
   voice/VoiceSettings.kt       TTS / 가족 목소리 선택 설정
   navi/NaviHelperRepo.kt       집 좌표, 경로 상태, 경로 요청
@@ -61,7 +65,8 @@ app/src/main/assets/demo_route.json
 app/src/main/res/raw/          가족 목소리 녹음 파일 자리
 docs/pleos-sdk-notes.md        SDK 사용법과 에뮬레이터에서 확인한 동작
 docs/voice-lines.md            녹음할 문장과 파일 이름
-docs/pleos-support-tts.md      TTS 엔진 문제 재현 정리 (Pleos 기술지원 문의용)
+docs/pleos-support-tts.md      TTS·STT 문제 재현 정리 (Pleos 기술지원 문의용)
+docs/day2-stt.md               STT 재시도 기록
 ```
 
 ## 사용 SDK·API

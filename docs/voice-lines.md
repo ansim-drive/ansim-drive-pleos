@@ -43,3 +43,23 @@ adb logcat -s AnsimDrive   # "Say ASK_ROUTE_HOME (... recording=true)" → "Reco
 ## 저장소에 올리지 않음
 
 녹음 파일은 가족의 실제 목소리라 개인정보로 다룬다. `.gitignore`에 `app/src/main/res/raw/voice_*`가 들어 있어 커밋되지 않으며, 로컬 빌드에만 포함된다. 저장소를 받아 빌드하면 녹음 없이 화면 문구로 안내한다.
+
+## 음성 인식 모델 (Vosk, 에뮬레이터용)
+
+Pleos 에뮬레이터의 시스템 음성 인식은 결과를 주지 않아(`docs/day2-stt.md`), 디버그 빌드는 기기 안에서 도는 Vosk로 "네/응/그래/아니요"를 듣는다. 모델은 크기(약 82MB) 때문에 저장소에 넣지 않는다 (`.gitignore`).
+
+1. 내려받기: https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip (모델 목록: https://alphacephei.com/vosk/models)
+2. 압축을 풀고 폴더 이름을 `vosk-model-ko`로 바꿔 아래처럼 넣는다:
+   ```
+   app/src/main/assets/vosk-model-ko/
+     am/final.mdl
+     conf/
+     graph/
+     ivector/
+     README
+   ```
+3. 빌드: `./gradlew assembleDebug -PdemoMode=true` (debug는 기본이 Vosk). 실차용 표준 인식으로 빌드하려면 `-PsttEngine=system`.
+4. 확인: `adb logcat -s AnsimDrive`에 `STT engine: Vosk`, `Vosk model ready`가 나오면 정상. 모델이 없으면 `STT engine: SpeechRecognizer`로 대신한다.
+
+라이선스는 모델 목록 페이지에 표시된 내용을 확인한다.
+
