@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var lastSpeedMs = -1L
     private var lastFix: Pair<Double, Double>? = null
     private var gpsKm = 0.0                    // 속도 정보가 없을 때(데모) 주행거리 대체
+    private var asking = false                 // 음성·버튼 대답이 겹쳐도 한 번만 처리
 
     private val permissionRequest = registerForActivityResult(RequestMultiplePermissions()) { result ->
         Log.i(TAG, "Permissions: $result")
@@ -118,6 +119,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopDriving() {
         driving = false
+        asking = false
         location.stop()
         voice.cancel()
         if (stats.distanceKm == 0.0) stats.distanceKm = gpsKm
@@ -141,17 +143,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askRouteHome() {
-        drivingFragment()?.showQuestion(getString(VoiceLine.ASK_ROUTE_HOME.text))
+        asking = true
+        drivingFragment()?.showQuestion(
+            getString(VoiceLine.ASK_ROUTE_HOME.text),
+            onYes = { onAnswer(true) },
+            onNo = { onAnswer(false) },
+        )
         voice.ask(VoiceLine.ASK_ROUTE_HOME) { answer ->
             when (answer) {
                 Answer.YES -> onAnswer(true)
                 Answer.NO -> onAnswer(false)
-                Answer.UNKNOWN -> drivingFragment()?.showAnswerButtons({ onAnswer(true) }, { onAnswer(false) })
+                Answer.UNKNOWN -> Log.i(TAG, "No voice answer: waiting for button")
             }
         }
     }
 
     private fun onAnswer(yes: Boolean) {
+        if (!asking) return
+        asking = false
         Log.i(TAG, "Answer: ${if (yes) "yes" else "no"}")
         drivingFragment()?.clearQuestion()
         val reply = when {

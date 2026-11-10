@@ -5,6 +5,7 @@
     <string name="parked_title">오늘 운전 요약</string>
     <string name="yes">네</string>
     <string name="no">아니요</string>
+    <string name="answer_hint">말씀하시거나 아래 버튼을 눌러 주세요</string>
     <string name="ask_route_home">같은 길을 몇 번 지나셨어요. 집으로 안내할까요?</string>
     <string name="routing_home">집으로 안내를 시작할게요.</string>
     <string name="no_home">집 주소가 아직 없어요. 내비게이션에 집을 등록해 주세요.</string>

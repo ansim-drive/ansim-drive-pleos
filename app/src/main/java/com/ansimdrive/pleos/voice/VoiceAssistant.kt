@@ -206,7 +206,7 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
             .build()
-        private const val LISTEN_TIMEOUT_MS = 8_000L
+        private const val LISTEN_TIMEOUT_MS = 4_000L
         private val LISTEN_TIMEOUT = Any()
         private val NO = listOf("아니", "싫어", "괜찮아", "됐어", "안 해")
         private val YES = listOf("네", "예", "응", "그래", "좋아", "부탁", "해 줘", "해줘")

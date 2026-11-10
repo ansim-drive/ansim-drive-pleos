@@ -25,11 +25,21 @@
         android:textSize="64sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/answerHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/answer_hint"
+        android:textColor="@color/text_sub"
+        android:textSize="32sp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/answerButtons"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:orientation="horizontal"
         android:visibility="gone">
 
