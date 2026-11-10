@@ -22,7 +22,7 @@
 # 일반 빌드 (위치: NaviHelper → 5초 안에 응답 없으면 GPS)
 ./gradlew assembleDebug
 
-# 데모 빌드 (assets/demo_route.json 좌표를 1초 간격으로 재생, 약 77초 뒤 헤맴 감지)
+# 데모 빌드 (assets/demo_route.json: 미니 회전교차로를 4바퀴 도는 좌표를 1초 간격으로 재생, 약 17초 뒤 헤맴 감지)
 ./gradlew assembleDebug -PdemoMode=true
 
 adb install -r app/build/outputs/apk/debug/app-debug.apk
