@@ -20,7 +20,7 @@ import java.util.Locale
  * (Pleos TTS/STT SDK는 1차 범위에서 사용하지 않는다.)
  *
  * 말하기 우선순위는 [VoiceSettings.mode]를 따른다. TTS 엔진이 없으면(Pleos 에뮬레이터)
- * "가족 목소리 안내" 녹음(res/raw)을 재생하고, 녹음도 없으면 소리 없이 넘어간다(화면 문구만).
+ * 녹음 음성(res/raw)을 재생하고, 녹음도 없으면 소리 없이 넘어간다(화면 문구만).
  *
  * 듣기 엔진은 BuildConfig.STT_ENGINE으로 고른다: "vosk"(에뮬레이터용, 기기 내 인식) / "system"(실차용).
  * Vosk 모델이 assets에 없으면 system으로 대신한다.
@@ -74,7 +74,7 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
     fun say(line: VoiceLine, onDone: () -> Unit = {}) {
         cancel()
         val recording = recordingId(line)
-        val useRecording = recording != 0 && (settings.mode == VoiceSettings.Mode.FAMILY || !ttsReady)
+        val useRecording = recording != 0 && (settings.mode == VoiceSettings.Mode.RECORDED || !ttsReady)
         Log.i(TAG, "Say ${line.name} (mode=${settings.mode}, tts=$ttsReady, recording=${recording != 0})")
         when {
             useRecording -> play(recording, onDone)

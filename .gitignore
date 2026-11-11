@@ -16,7 +16,7 @@ keystore.properties
 *.jks
 *.keystore
 
-# Family voice recordings: personal data, local builds only (docs/voice-lines.md)
+# Recorded voice files: personal data, local builds only (docs/voice-lines.md)
 app/src/main/res/raw/voice_*
 
 # Vosk speech model: large binary, download per docs/voice-lines.md
