@@ -15,4 +15,7 @@
     <string name="routing_home">집으로 안내를 시작할게요.</string>
     <string name="no_home">집 주소가 아직 없어요. 내비게이션에 집을 등록해 주세요.</string>
     <string name="declined">알겠어요. 천천히 조심해서 가세요.</string>
+    <string name="depart_dark">어두워졌어요. 천천히 가세요.</string>
+    <string name="depart_rain">비가 와요. 천천히 가세요.</string>
+    <string name="depart_dark_rain">어둡고 비가 와요. 천천히 가세요.</string>
 </resources>

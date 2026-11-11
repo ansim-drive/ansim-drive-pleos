@@ -56,11 +56,17 @@ class PleosVehicleRepo(
 
         // initialize()가 예외 없이 끝나도 서비스 연결이 보장되지 않으므로 실제 값을 한 번 읽어 확인한다.
         brake.getCurrentBrakePedalStatus(
-            { Log.i(TAG, "Vehicle SDK ok: brake pedal=$it") },
+            { pressed ->
+                Log.i(TAG, "Vehicle SDK ok: brake pedal=$pressed")
+                if (pressed != null) main.post { onBrake(pressed) }
+            },
             { Log.w(TAG, "Vehicle SDK brake read failed", it) },
         )
         light.getCurrentLowBeamLightState(
-            { Log.i(TAG, "Vehicle SDK ok: low beam=$it") },
+            { state ->
+                Log.i(TAG, "Vehicle SDK ok: low beam=$state")
+                if (state != null) main.post { onHeadlight(state == LightState.ON) }
+            },
             { Log.w(TAG, "Vehicle SDK low beam read failed (night falls back to clock)", it) },
         )
         brake.registerBrakePedalStatus(brakeListener)

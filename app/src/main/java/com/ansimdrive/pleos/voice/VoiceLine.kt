@@ -12,4 +12,7 @@ enum class VoiceLine(@StringRes val text: Int, val rawName: String) {
     ROUTING_HOME(R.string.routing_home, "voice_routing_home"),
     NO_HOME(R.string.no_home, "voice_no_home"),
     DECLINED(R.string.declined, "voice_declined"),
+    DEPART_DARK(R.string.depart_dark, "voice_depart_dark"),
+    DEPART_RAIN(R.string.depart_rain, "voice_depart_rain"),
+    DEPART_DARK_RAIN(R.string.depart_dark_rain, "voice_depart_dark_rain"),
 }

@@ -112,8 +112,14 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
         val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
             .setAudioAttributes(GUIDANCE)
             .build()
+        // 음성 비서 등이 포커스를 쥐고 있으면 차량 오디오가 거부한다. 끼어들지 않고 넘어간다(화면 문구는 그대로).
+        if (audio.requestAudioFocus(request) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.w(TAG, "Audio focus denied: recording skipped")
+            mp.release()
+            main.post(onDone)
+            return
+        }
         focus = request
-        audio.requestAudioFocus(request)
         mp.setOnCompletionListener {
             Log.d(TAG, "Recording done")
             stopPlayer()

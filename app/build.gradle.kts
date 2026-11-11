@@ -20,6 +20,9 @@ android {
         // 컴파일 타임 상수면 증분 빌드에서 이전 값이 남으므로 parseBoolean으로 감싼다.
         val demoMode = (project.findProperty("demoMode") ?: "false").toString()
         buildConfigField("boolean", "DEMO_MODE", "Boolean.parseBoolean(\"$demoMode\")")
+        // 출발 전 한마디용 더미 날씨 (1차는 서버 없음): clear | rain. ./gradlew assembleDebug -Pweather=rain
+        val weather = (project.findProperty("weather") ?: "clear").toString()
+        buildConfigField("String", "WEATHER", "String.valueOf(\"$weather\")")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

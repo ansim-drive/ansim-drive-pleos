@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private var lastFix: Pair<Double, Double>? = null
     private var gpsKm = 0.0                    // 속도 정보가 없을 때(데모) 주행거리 대체
     private var asking = false                 // 음성·버튼 대답이 겹쳐도 한 번만 처리
+    private var parkedBeforeDrive = false      // P→D 전환일 때만 출발 전 한마디
 
     private val permissionRequest = registerForActivityResult(RequestMultiplePermissions()) { result ->
         Log.i(TAG, "Permissions: $result")
@@ -117,7 +118,10 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "Gear: ${VehicleGear.toString(gear)}")
         when (gear) {
             VehicleGear.GEAR_DRIVE -> if (!driving) startDriving()
-            VehicleGear.GEAR_PARK -> if (driving) stopDriving()
+            VehicleGear.GEAR_PARK -> {
+                parkedBeforeDrive = true
+                if (driving) stopDriving()
+            }
         }
     }
 
@@ -126,6 +130,8 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "Driving started")
         show(DrivingFragment())
         updateNight()
+        if (parkedBeforeDrive) sayDepartureRemark()
+        parkedBeforeDrive = false
         wandering.reset()
         lastFix = null
         location.start(::onLocation)
@@ -151,6 +157,20 @@ class MainActivity : AppCompatActivity() {
             week = WeeklyStatus.of(WeekTotals(stats.hardBrakes, stats.wanderings, nightMinutes = 0), lastWeek = null),
             familySharing = settings.familySharing,
         ))
+    }
+
+    /** 출발 전 한마디: 어둡거나(헤드라이트 ON) 비가 오면(더미 날씨) 한 번 말한다. 둘 다 아니면 조용히. */
+    private fun sayDepartureRemark() {
+        val dark = headlightOn == true
+        val rain = BuildConfig.WEATHER == "rain"
+        val line = when {
+            dark && rain -> VoiceLine.DEPART_DARK_RAIN
+            dark -> VoiceLine.DEPART_DARK
+            rain -> VoiceLine.DEPART_RAIN
+            else -> null
+        }
+        Log.i(TAG, "Departure remark: dark=$dark, rain=$rain -> ${line ?: "silent"}")
+        line?.let { voice.say(it) }
     }
 
     // ---- 헤맴 감지 → 음성 질문 → 집 안내 ----
