@@ -60,7 +60,10 @@ app/src/main/java/com/ansimdrive/pleos/
   voice/VoiceLine.kt           앱이 말하는 문장 목록 (문자열 ↔ 녹음 파일)
   voice/VoiceSettings.kt       TTS / 가족 목소리 선택 설정
   navi/NaviHelperRepo.kt       집 좌표, 경로 상태, 경로 요청
-  data/TripStats.kt            오늘 주행 요약
+  data/DriveDatabase.kt        Room: TripEvent(급제동·헤맴·야간 분), DailySummary(하루 합계)
+  data/DriveLog.kt             기록 저장·요약 읽기 (이번 주 vs 지난주)
+  data/WeeklyStatus.kt         이번 주 상태(맑음/흐림/비) 규칙
+  data/AppSettings.kt          설정 (가족 공유 상태)
 app/src/main/assets/demo_route.json
 app/src/main/res/raw/          가족 목소리 녹음 파일 자리
 docs/pleos-sdk-notes.md        SDK 사용법과 에뮬레이터에서 확인한 동작
@@ -92,4 +95,3 @@ docs/day2-stt.md               STT 재시도 기록
 - **음성 인식**: 에뮬레이터에서 인식 결과가 오지 않습니다. 음성 인식은 4초 뒤 끝나고, 버튼으로 대답합니다.
 - **위치**: NaviHelper 위치는 지도 앱 위치로 고정되어 움직이지 않으므로 헤맴 시연은 데모 빌드로 합니다.
 - **백그라운드**: 내비가 앞에 나와 있는 동안 앱이 멈춰 있다가, 앱으로 돌아오면 쌓인 기어 변경이 반영되어 요약 화면이 나옵니다.
-- 주행 요약은 메모리에만 있어 앱을 종료하면 사라집니다.

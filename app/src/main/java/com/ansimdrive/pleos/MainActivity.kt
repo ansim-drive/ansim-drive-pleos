@@ -5,16 +5,17 @@ import android.car.Car
 import android.car.VehicleGear
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import com.ansimdrive.pleos.data.AppSettings
+import com.ansimdrive.pleos.data.DriveLog
 import com.ansimdrive.pleos.data.TripStats
-import com.ansimdrive.pleos.data.WeekTotals
-import com.ansimdrive.pleos.data.WeeklyStatus
 import com.ansimdrive.pleos.databinding.ActivityMainBinding
 import com.ansimdrive.pleos.detection.DetectionConfig
 import com.ansimdrive.pleos.detection.WanderingDetector
@@ -34,6 +35,7 @@ import com.ansimdrive.pleos.voice.VoiceAssistant.Answer
 import com.ansimdrive.pleos.voice.VoiceLine
 import com.ansimdrive.pleos.voice.VoiceSettings
 import com.ansimdrive.pleos.voice.VoskSpeechInput
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 /** 기어 상태에 따라 DrivingFragment / ParkedFragment를 전환하고, 주행 중 헤맴을 감지한다. */
@@ -47,7 +49,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var voice: VoiceAssistant
 
     private lateinit var settings: AppSettings
-    private val stats = TripStats()
+    private lateinit var driveLog: DriveLog
+    private var trip = TripStats()
+    private var nightSinceMs: Long? = null       // 지금 야간 주행 중이면 시작 시각
     private val hardBrake = HardBrakeDetector()
     private val wandering = WanderingDetector()
     private var driving = false
@@ -56,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     private var lastKmh = 0f
     private var lastSpeedMs = -1L
     private var lastFix: Pair<Double, Double>? = null
-    private var gpsKm = 0.0                    // 속도 정보가 없을 때(데모) 주행거리 대체
+    private var gpsKm = 0.0                    // 속도 정보가 없을 때(데모) 이번 주행 거리 대체
     private var asking = false                 // 음성·버튼 대답이 겹쳐도 한 번만 처리
     private var parkedBeforeDrive = false      // P→D 전환일 때만 출발 전 한마디
 
@@ -77,6 +81,9 @@ class MainActivity : AppCompatActivity() {
         location = if (BuildConfig.DEMO_MODE) DemoLocationSource(this) else AutoLocationSource(this, navi)
         voice = VoiceAssistant(this, VoiceSettings(this))
         settings = AppSettings(this)
+        driveLog = DriveLog(this)
+        // 전주 비교 확인용(디버그 빌드만): --ez debug_seed_last_week true
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("debug_seed_last_week", false)) driveLog.seedEmptyLastWeek()
 
         if (savedInstanceState == null) showSummary()
 
@@ -127,6 +134,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun startDriving() {
         driving = true
+        trip = TripStats()
+        gpsKm = 0.0
+        nightSinceMs = null
         Log.i(TAG, "Driving started")
         show(DrivingFragment())
         updateNight()
@@ -142,21 +152,28 @@ class MainActivity : AppCompatActivity() {
         asking = false
         location.stop()
         voice.cancel()
-        if (stats.distanceKm == 0.0) stats.distanceKm = gpsKm
-        Log.i(TAG, "Driving stopped: %.2f km, hard brakes=%d, night=%b"
-            .format(stats.distanceKm, stats.hardBrakes, stats.nightDriving))
+        nightSinceMs?.let { trip.nightMs += SystemClock.elapsedRealtime() - it }
+        nightSinceMs = null
+        val km = if (trip.distanceKm > 0) trip.distanceKm else gpsKm
+        val nightMinutes = ((trip.nightMs + 59_999) / 60_000).toInt()   // 조금이라도 있으면 1분
+        Log.i(TAG, "Driving stopped: %.2f km, night=%d min".format(km, nightMinutes))
+        driveLog.endTrip(km, nightMinutes)
         showSummary()
     }
 
-    /** 1차: 오늘 기록만 메모리에 있어 전주 비교가 없으므로 이번 주 상태는 맑음. */
+    /** DB에서 오늘 합계와 이번 주 상태를 읽어 요약 화면을 띄운다. */
     private fun showSummary() {
-        show(ParkedFragment.newInstance(
-            distanceKm = stats.distanceKm,
-            hardBrakes = stats.hardBrakes,
-            nightDriving = stats.nightDriving,
-            week = WeeklyStatus.of(WeekTotals(stats.hardBrakes, stats.wanderings, nightMinutes = 0), lastWeek = null),
-            familySharing = settings.familySharing,
-        ))
+        lifecycleScope.launch {
+            val s = driveLog.summary()
+            if (driving) return@launch
+            show(ParkedFragment.newInstance(
+                distanceKm = s.distanceKm,
+                hardBrakes = s.hardBrakes,
+                nightDriving = s.nightDriving,
+                week = s.week,
+                familySharing = settings.familySharing,
+            ))
+        }
     }
 
     /** 출발 전 한마디: 어둡거나(헤드라이트 ON) 비가 오면(더미 날씨) 한 번 말한다. 둘 다 아니면 조용히. */
@@ -185,7 +202,7 @@ class MainActivity : AppCompatActivity() {
         drivingFragment()?.setDetectionActive(!wandering.suppressedAt(lat, lon))
         val reason = wandering.onLocation(lat, lon, timeMs) ?: return
         Log.i(TAG, "Wandering detected: $reason at $lat, $lon")
-        stats.wanderings++
+        driveLog.wandering()
         askRouteHome()
     }
 
@@ -223,14 +240,14 @@ class MainActivity : AppCompatActivity() {
     private fun onSpeed(kmh: Float, timeMs: Long) {
         if (driving && lastSpeedMs >= 0) {
             val dtMs = (timeMs - lastSpeedMs).coerceIn(0, 5_000)
-            stats.distanceKm += (lastKmh + kmh) / 2 * dtMs / 3_600_000.0
+            trip.distanceKm += (lastKmh + kmh) / 2 * dtMs / 3_600_000.0
         }
         lastKmh = kmh
         lastSpeedMs = timeMs
 
         if (driving && hardBrake.onSpeed(kmh, timeMs, brakeOn)) {
-            stats.hardBrakes++
-            Log.i(TAG, "Hard brake #${stats.hardBrakes} (now %.0f km/h)".format(kmh))
+            Log.i(TAG, "Hard brake (now %.0f km/h)".format(kmh))
+            driveLog.hardBrake(kmh)
         }
     }
 
@@ -245,14 +262,21 @@ class MainActivity : AppCompatActivity() {
         updateNight()
     }
 
+    /** 야간 주행 시간을 잰다: 헤드라이트 ON 구간, 정보가 없으면 시각(일몰~일출 근사). */
     private fun updateNight() {
-        if (!driving || stats.nightDriving) return
+        if (!driving) return
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val night = headlightOn
             ?: (hour >= DetectionConfig.NIGHT_START_HOUR || hour < DetectionConfig.NIGHT_END_HOUR)
-        if (night) {
-            stats.nightDriving = true
-            Log.i(TAG, "Night driving (source=${if (headlightOn != null) "headlight" else "clock"})")
+        val now = SystemClock.elapsedRealtime()
+        val since = nightSinceMs
+        if (night && since == null) {
+            nightSinceMs = now
+            Log.i(TAG, "Night driving started (source=${if (headlightOn != null) "headlight" else "clock"})")
+        } else if (!night && since != null) {
+            trip.nightMs += now - since
+            nightSinceMs = null
+            Log.i(TAG, "Night driving paused")
         }
     }
 

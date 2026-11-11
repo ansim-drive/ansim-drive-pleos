@@ -1,9 +1,7 @@
 package com.ansimdrive.pleos.data
 
-/** 오늘 주행 요약 (1차: 메모리에만 보관). */
+/** 이번 주행(P→D→P) 한 번의 값. 끝나면 [DriveLog.endTrip]으로 저장한다. */
 class TripStats {
     var distanceKm = 0.0
-    var hardBrakes = 0
-    var wanderings = 0
-    var nightDriving = false
+    var nightMs = 0L
 }
