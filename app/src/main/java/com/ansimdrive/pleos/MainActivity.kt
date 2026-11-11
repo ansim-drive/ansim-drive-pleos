@@ -3,6 +3,7 @@ package com.ansimdrive.pleos
 import android.Manifest
 import android.car.Car
 import android.car.VehicleGear
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.SystemClock
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionRequest = registerForActivityResult(RequestMultiplePermissions()) { result ->
         Log.i(TAG, "Permissions: $result")
-        startSources()
+        restartInNewTask()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +90,8 @@ class MainActivity : AppCompatActivity() {
 
         // 권한 다이얼로그는 주행 중(UX 제한)에는 차단되므로 정차 중 첫 실행에서 받는다.
         val missing = RUNTIME_PERMISSIONS.filterNot(::granted)
-        if (missing.isEmpty()) startSources() else permissionRequest.launch(missing.toTypedArray())
+        val restarted = intent.getBooleanExtra(EXTRA_AFTER_PERMISSIONS, false)
+        if (missing.isEmpty() || restarted) startSources() else permissionRequest.launch(missing.toTypedArray())
 
         // 음성 테스트용(디버그 빌드만): adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true
         if (BuildConfig.DEBUG && intent.hasExtra("debug_vosk_grammar")) {
@@ -111,6 +113,20 @@ class MainActivity : AppCompatActivity() {
         navi.stop()
         voice.release()
         super.onDestroy()
+    }
+
+    /**
+     * 권한 창을 띄웠던 실행(태스크)은 Pleos 홈 화면이 주행 중에 "사용할 수 없습니다"로 막는다(에뮬레이터 확인).
+     * 새 태스크로 다시 시작하면 정상이므로 권한 결과를 받으면 바로 다시 시작한다. 다시 시작한 실행은 권한을 묻지 않는다.
+     */
+    private fun restartInNewTask() {
+        Log.i(TAG, "Restarting in a new task after the permission dialog")
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .putExtra(EXTRA_AFTER_PERMISSIONS, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+        )
+        finishAndRemoveTask()
     }
 
     private fun startSources() {
@@ -293,6 +309,7 @@ class MainActivity : AppCompatActivity() {
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
     companion object {
+        private const val EXTRA_AFTER_PERMISSIONS = "after_permissions"
         private val RUNTIME_PERMISSIONS = listOf(
             Car.PERMISSION_SPEED,
             Manifest.permission.ACCESS_FINE_LOCATION,
