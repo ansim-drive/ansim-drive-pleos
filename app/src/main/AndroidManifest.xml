@@ -14,7 +14,7 @@
     <!-- Pleos NaviHelper: 위치·북마크·경로상태 / 경로 요청 -->
     <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
     <uses-permission android:name="pleos.car.permission.NAVI_ROUTE_SEARCH" />
-    <!-- 위치 대체 소스(GPS), 음성 인식 -->
+    <!-- 위치 대체 소스(GPS, FINE은 COARSE와 함께 선언·요청), 음성 인식 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

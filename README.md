@@ -72,16 +72,33 @@ docs/pleos-support-tts.md      TTS·STT 문제 재현 정리 (Pleos 기술지원
 docs/day2-stt.md               STT 재시도 기록
 ```
 
-## 사용 SDK·API
+## 사용 SDK·권한
 
-| 용도 | API |
+| 용도 | SDK·API |
 |---|---|
 | 속도, 기어 | AAOS `CarPropertyManager` (`PERF_VEHICLE_SPEED`, `GEAR_SELECTION`) |
-| 브레이크, 헤드라이트 | Pleos Vehicle SDK 2.3.2 (`Brake`, `Light`) |
+| 브레이크, 헤드라이트 | Pleos Vehicle SDK 2.3.2 (`Brake`, `Light`의 로우빔) |
 | 위치, 집 좌표, 경로 | Pleos NaviHelper SDK 3.0.5 (`getCurrentLocationInfo`, `getBookmarkInfo`, `getRouteStateInfo`, `requestRoute`) |
-| 음성 | Android `TextToSpeech`, `SpeechRecognizer` |
+| 위치 대체 | Android `LocationManager` (GPS) — NaviHelper 응답이 없을 때 |
+| 음성 출력 | Android `TextToSpeech`, 없으면 녹음 음성(`MediaPlayer`) |
+| 음성 인식 | 실차: Android `SpeechRecognizer` / 에뮬레이터(debug): Vosk 0.3.75 기기 내 인식 |
+| 저장 | Room 2.6.1 (로컬 SQLite) |
 
 서버 통신은 없습니다.
+
+| 권한 | 보호 수준 | 쓰는 곳 |
+|---|---|---|
+| `android.car.permission.CAR_SPEED` | 위험(실행 중 요청) | 속도 → 급제동·주행거리 |
+| `android.car.permission.CAR_POWERTRAIN` | 일반 | 기어 → 화면 전환 |
+| `pleos.car.permission.CAR_DRIVE` | 일반 | 브레이크 페달 → 급제동 |
+| `pleos.car.permission.CAR_LIGHTS` | 일반 | 로우빔 → 야간 주행, 출발 전 한마디 |
+| `pleos.car.permission.NAVI_ROUTE` | 일반 | 현재 위치, 집 북마크, 경로 안내 상태 |
+| `pleos.car.permission.NAVI_ROUTE_SEARCH` | 일반 | 집으로 경로 요청 |
+| `android.permission.ACCESS_FINE_LOCATION` | 위험(실행 중 요청) | GPS 위치 대체 |
+| `android.permission.ACCESS_COARSE_LOCATION` | 위험(실행 중 요청) | Android 12 이상에서 FINE과 함께 요청해야 함 |
+| `android.permission.RECORD_AUDIO` | 위험(실행 중 요청) | "네/아니요" 음성 인식 |
+
+라이브러리가 자동으로 추가하는 권한: `ai.pleos.playground.service.vehicle.VEHICLE_BINDING`(Vehicle SDK 서비스 연결), `com.ansimdrive.pleos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`(androidx 내부용). 실행 중 요청 권한은 앱 첫 실행 때 한 번에 묻습니다(기어 P에서).
 
 ## 알려진 제한
 

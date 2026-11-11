@@ -296,6 +296,7 @@ class MainActivity : AppCompatActivity() {
         private val RUNTIME_PERMISSIONS = listOf(
             Car.PERMISSION_SPEED,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,   // Android 12+: FINE은 COARSE와 함께 요청
             Manifest.permission.RECORD_AUDIO,
         )
     }
