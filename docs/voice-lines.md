@@ -14,6 +14,17 @@
 
 문장은 `app/src/main/res/values/strings.xml`과 같다. 문장을 바꾸면 두 곳을 같이 고친다.
 
+## 시연용 음성 만들기 (macOS)
+
+녹음 대신 macOS 음성 합성으로 시연용 임시 파일을 만들 수 있다. 배포용이 아니다.
+
+```bash
+scripts/gen_voice.sh             # 위 표의 7개 문장을 say -v Yuna로 합성 → res/raw/<파일명>.m4a
+VOICE=Eddy scripts/gen_voice.sh  # 다른 한국어 음성
+```
+
+표의 문장을 읽어서 만들기 때문에, 문장을 바꾸면 이 표와 `strings.xml`을 고친 뒤 다시 실행한다.
+
 ## 파일 규칙
 
 - 확장자: `.m4a`, `.mp3`, `.ogg`, `.wav` 중 하나. 예: `voice_ask_route_home.m4a`
