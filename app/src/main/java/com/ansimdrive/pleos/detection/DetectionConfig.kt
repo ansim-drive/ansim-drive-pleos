@@ -20,6 +20,10 @@ object DetectionConfig {
     const val HARD_BRAKE_KMH_PER_SEC = 11f
     const val HARD_BRAKE_COOLDOWN_MS = 3_000L
 
+    // 이번 주 상태: 급제동·헤맴·야간 3개 지표 중 전주보다 늘어난 개수
+    const val WEEKLY_CLOUDY_AT = 1                // 이상이면 흐림
+    const val WEEKLY_RAIN_AT = 2                  // 이상이면 비
+
     // 헤드라이트 정보가 없을 때 야간 근사 (일몰~일출)
     const val NIGHT_START_HOUR = 19
     const val NIGHT_END_HOUR = 6

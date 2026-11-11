@@ -3,6 +3,11 @@
     <string name="app_name">안심 드라이브</string>
     <string name="driving">운전 중</string>
     <string name="parked_title">오늘 운전 요약</string>
+    <string name="summary_distance">주행 거리</string>
+    <string name="summary_hard_brakes">급제동</string>
+    <string name="summary_night">밤 운전</string>
+    <string name="summary_week">이번 주</string>
+    <string name="family_sharing">가족 공유: %1$s</string>
     <string name="yes">네</string>
     <string name="no">아니요</string>
     <string name="answer_hint">말씀하시거나 아래 버튼을 눌러 주세요</string>

@@ -11,7 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import com.ansimdrive.pleos.data.AppSettings
 import com.ansimdrive.pleos.data.TripStats
+import com.ansimdrive.pleos.data.WeekTotals
+import com.ansimdrive.pleos.data.WeeklyStatus
 import com.ansimdrive.pleos.databinding.ActivityMainBinding
 import com.ansimdrive.pleos.detection.DetectionConfig
 import com.ansimdrive.pleos.detection.WanderingDetector
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var location: LocationSource
     private lateinit var voice: VoiceAssistant
 
+    private lateinit var settings: AppSettings
     private val stats = TripStats()
     private val hardBrake = HardBrakeDetector()
     private val wandering = WanderingDetector()
@@ -71,8 +75,9 @@ class MainActivity : AppCompatActivity() {
         navi = NaviHelperRepo(this)
         location = if (BuildConfig.DEMO_MODE) DemoLocationSource(this) else AutoLocationSource(this, navi)
         voice = VoiceAssistant(this, VoiceSettings(this))
+        settings = AppSettings(this)
 
-        if (savedInstanceState == null) show(ParkedFragment.newInstance(stats))
+        if (savedInstanceState == null) showSummary()
 
         // 권한 다이얼로그는 주행 중(UX 제한)에는 차단되므로 정차 중 첫 실행에서 받는다.
         val missing = RUNTIME_PERMISSIONS.filterNot(::granted)
@@ -134,7 +139,18 @@ class MainActivity : AppCompatActivity() {
         if (stats.distanceKm == 0.0) stats.distanceKm = gpsKm
         Log.i(TAG, "Driving stopped: %.2f km, hard brakes=%d, night=%b"
             .format(stats.distanceKm, stats.hardBrakes, stats.nightDriving))
-        show(ParkedFragment.newInstance(stats))
+        showSummary()
+    }
+
+    /** 1차: 오늘 기록만 메모리에 있어 전주 비교가 없으므로 이번 주 상태는 맑음. */
+    private fun showSummary() {
+        show(ParkedFragment.newInstance(
+            distanceKm = stats.distanceKm,
+            hardBrakes = stats.hardBrakes,
+            nightDriving = stats.nightDriving,
+            week = WeeklyStatus.of(WeekTotals(stats.hardBrakes, stats.wanderings, nightMinutes = 0), lastWeek = null),
+            familySharing = settings.familySharing,
+        ))
     }
 
     // ---- 헤맴 감지 → 음성 질문 → 집 안내 ----
@@ -148,6 +164,7 @@ class MainActivity : AppCompatActivity() {
         wandering.routeActive = navi.routeActive
         val reason = wandering.onLocation(lat, lon, timeMs) ?: return
         Log.i(TAG, "Wandering detected: $reason at $lat, $lon")
+        stats.wanderings++
         askRouteHome()
     }
 
