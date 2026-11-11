@@ -8,6 +8,7 @@
     <string name="summary_night">밤 운전</string>
     <string name="summary_week">이번 주</string>
     <string name="family_sharing">가족 공유: %1$s</string>
+    <string name="summary_disclaimer">운전 습관 변화를 보여주며 건강 상태를 판단하지 않습니다</string>
     <string name="yes">네</string>
     <string name="no">아니요</string>
     <string name="detection_on">헤맴 감지 켜짐</string>

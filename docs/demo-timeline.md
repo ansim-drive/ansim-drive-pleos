@@ -6,7 +6,7 @@
 
 ```bash
 scripts/gen_voice.sh                                         # 안내 음성 7개 생성 (res/raw, 저장소 미포함)
-./gradlew assembleDebug -PdemoMode=true -PsttEngine=system
+./gradlew clean assembleDebug -PdemoMode=true -PsttEngine=system   # 레이아웃을 바꾼 뒤에는 clean 필수
 ```
 
 | 옵션 | 값 | 이유 |
@@ -31,7 +31,7 @@ scripts/gen_voice.sh                                         # 안내 음성 7�
 4. 음성 생성·빌드·앱 초기화·설치:
    ```bash
    scripts/gen_voice.sh
-   ./gradlew assembleDebug -PdemoMode=true -PsttEngine=system
+   ./gradlew clean assembleDebug -PdemoMode=true -PsttEngine=system
    adb shell pm clear --user 10 com.ansimdrive.pleos
    adb install -r app/build/outputs/apk/debug/app-debug.apk
    ```

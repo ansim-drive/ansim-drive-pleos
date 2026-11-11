@@ -1,53 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 정차 요약: 검정 배경 + 흰 글씨, 32sp 이상, 버튼 없음 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 정차 요약: 검정 배경 + 흰 글씨, 32sp 이상, 버튼 없음. 맨 아래에 안내 문구 고정. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="48dp">
+    android:background="@color/bg_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/parked_title"
+            android:textColor="@color/text_main"
+            android:textSize="64sp"
+            android:textStyle="bold" />
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center_horizontal">
+
+            <TableRow>
+                <TextView style="@style/SummaryLabel" android:text="@string/summary_distance" />
+                <TextView android:id="@+id/distance" style="@style/SummaryValue" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/SummaryLabel" android:text="@string/summary_hard_brakes" />
+                <TextView android:id="@+id/hardBrakes" style="@style/SummaryValue" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/SummaryLabel" android:text="@string/summary_night" />
+                <TextView android:id="@+id/night" style="@style/SummaryValue" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/SummaryLabel" android:text="@string/summary_week" />
+                <TextView android:id="@+id/week" style="@style/SummaryValue" />
+            </TableRow>
+        </TableLayout>
+
+        <TextView
+            android:id="@+id/familySharing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:textColor="@color/text_main"
+            android:textSize="32sp" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/parked_title"
-        android:textColor="@color/text_main"
-        android:textSize="64sp"
-        android:textStyle="bold" />
-
-    <TableLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_gravity="center_horizontal">
-
-        <TableRow>
-            <TextView style="@style/SummaryLabel" android:text="@string/summary_distance" />
-            <TextView android:id="@+id/distance" style="@style/SummaryValue" />
-        </TableRow>
-
-        <TableRow>
-            <TextView style="@style/SummaryLabel" android:text="@string/summary_hard_brakes" />
-            <TextView android:id="@+id/hardBrakes" style="@style/SummaryValue" />
-        </TableRow>
-
-        <TableRow>
-            <TextView style="@style/SummaryLabel" android:text="@string/summary_night" />
-            <TextView android:id="@+id/night" style="@style/SummaryValue" />
-        </TableRow>
-
-        <TableRow>
-            <TextView style="@style/SummaryLabel" android:text="@string/summary_week" />
-            <TextView android:id="@+id/week" style="@style/SummaryValue" />
-        </TableRow>
-    </TableLayout>
-
-    <TextView
-        android:id="@+id/familySharing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:paddingHorizontal="48dp"
+        android:text="@string/summary_disclaimer"
         android:textColor="@color/text_main"
         android:textSize="32sp" />
-</LinearLayout>
+</FrameLayout>
