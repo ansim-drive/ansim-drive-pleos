@@ -182,6 +182,7 @@ class MainActivity : AppCompatActivity() {
 
         wandering.home = navi.home?.let { it.latitude to it.longitude }
         wandering.routeActive = navi.routeActive
+        drivingFragment()?.setDetectionActive(!wandering.suppressedAt(lat, lon))
         val reason = wandering.onLocation(lat, lon, timeMs) ?: return
         Log.i(TAG, "Wandering detected: $reason at $lat, $lon")
         stats.wanderings++

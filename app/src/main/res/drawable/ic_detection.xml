@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 헤맴 감지 상태 아이콘 (과녁 모양). 색은 코드에서 바꾼다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2a10,10 0,1 0,0 20a10,10 0,1 0,0 -20zM12,4.5a7.5,7.5 0,1 1,0 15a7.5,7.5 0,1 1,0 -15zM12,8a4,4 0,1 0,0 8a4,4 0,1 0,0 -8z" />
+</vector>

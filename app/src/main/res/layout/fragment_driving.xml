@@ -1,70 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 주행 중: 검정 배경에 "운전 중" 한 줄 + 작은 헤맴 감지 상태 아이콘. 질문할 때는 위 절반에 문구, 아래 절반에 버튼. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="48dp">
+    android:background="@color/bg_dark">
 
     <TextView
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:text="@string/driving"
         android:textColor="@color/text_main"
         android:textSize="120sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/question"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@color/text_main"
-        android:textSize="64sp"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/answerHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/answer_hint"
-        android:textColor="@color/text_sub"
-        android:textSize="32sp"
-        android:visibility="gone" />
+    <ImageView
+        android:id="@+id/detectionIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="24dp"
+        android:contentDescription="@string/detection_off"
+        android:src="@drawable/ic_detection"
+        android:tint="@color/detection_off" />
 
     <LinearLayout
-        android:id="@+id/answerButtons"
+        android:id="@+id/questionPanel"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:visibility="gone">
 
-        <Button
-            android:id="@+id/yes"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/accent"
-            android:text="@string/yes"
-            android:textColor="@color/text_main"
-            android:textSize="72sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
 
-        <Button
-            android:id="@+id/no"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="24dp"
+            <TextView
+                android:id="@+id/question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/text_main"
+                android:textSize="64sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/answerHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/answer_hint"
+                android:textColor="@color/text_main"
+                android:textSize="36sp" />
+        </LinearLayout>
+
+        <!-- 화면 아래 절반 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/accent_no"
-            android:text="@string/no"
-            android:textColor="@color/text_main"
-            android:textSize="72sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="24dp">
+
+            <Button
+                android:id="@+id/yes"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/accent"
+                android:text="@string/yes"
+                android:textColor="@color/text_main"
+                android:textSize="96sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/no"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/accent_no"
+                android:text="@string/no"
+                android:textColor="@color/text_main"
+                android:textSize="96sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

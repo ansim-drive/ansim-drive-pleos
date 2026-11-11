@@ -10,6 +10,8 @@
     <string name="family_sharing">가족 공유: %1$s</string>
     <string name="yes">네</string>
     <string name="no">아니요</string>
+    <string name="detection_on">헤맴 감지 켜짐</string>
+    <string name="detection_off">헤맴 감지 쉬는 중</string>
     <string name="answer_hint">말씀하시거나 아래 버튼을 눌러 주세요</string>
     <string name="ask_route_home">같은 길을 몇 번 지나셨어요. 집으로 안내할까요?</string>
     <string name="routing_home">집으로 안내를 시작할게요.</string>

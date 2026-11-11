@@ -5,4 +5,6 @@
     <color name="text_sub">#FFB0BEC5</color>
     <color name="accent">#FF2E7D32</color>
     <color name="accent_no">#FF546E7A</color>
+    <color name="detection_on">#FF66BB6A</color>
+    <color name="detection_off">#FF616161</color>
 </resources>

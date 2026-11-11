@@ -69,6 +69,9 @@ class WanderingDetector {
         return reason
     }
 
+    /** 이 위치에서 감지를 쉬는지 (경로 안내 중이거나 집 근처). */
+    fun suppressedAt(lat: Double, lon: Double) = routeActive || nearHome(lat, lon)
+
     private fun nearHome(lat: Double, lon: Double) =
         home?.let { distanceM(it.first, it.second, lat, lon) <= C.HOME_RADIUS_M } == true
 }
