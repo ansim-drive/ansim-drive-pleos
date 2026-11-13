@@ -1,6 +1,15 @@
-# 안심 드라이브
+# 님과 함께
 
-낯선 길에서 헤매는 고령 운전자에게 차량이 먼저 말을 거는 음성 동반자 앱입니다. Pleos Connect(AAOS)용입니다.
+- **앱 이름**: 님과 함께
+- **한 줄 소개**: 낯선 길에서 헤매는 고령 운전자에게 차량이 먼저 말을 거는 음성 동반자 앱 (Pleos Connect)
+- **실행 방법**: Pleos Connect Emulator v2.1.0에 APK 설치 → 기어 **P**에서 앱 실행·권한 허용 → Virtual Console에서 기어 **D** → 약 17초 뒤 질문에 **'네'** → 지도 앱 집 경로 안내 → 기어 **P**에서 오늘 운전 요약
+  ```bash
+  adb install -r "apk/둠_님과함께_release.apk"
+  adb shell am start -n com.ansimdrive.pleos/.MainActivity
+  ```
+- **APK 위치**: [`apk/둠_님과함께_release.apk`](apk/둠_님과함께_release.apk)
+
+## 소개
 
 같은 길을 반복해서 지나는 패턴을 감지하면 "같은 길을 몇 번 지나셨어요. 집으로 안내할까요?"라고 묻고, 대답하면 내비게이션에 집 경로를 요청합니다. 주행 중 화면은 최소화하고, 정차하면 오늘 운전 요약을 큰 글씨로 보여 줍니다.
 
