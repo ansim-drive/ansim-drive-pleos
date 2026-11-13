@@ -211,14 +211,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun onLocation(lat: Double, lon: Double, timeMs: Long) {
         lastFix?.let { gpsKm += distanceM(it.first, it.second, lat, lon) / 1000 }
-        if (lastFix == null) Log.i(TAG, "First fix from ${location.name}: $lat, $lon")
+        if (lastFix == null) Log.i(TAG, "First fix from ${location.name}: ${logCoords(lat, lon)}")
         lastFix = lat to lon
 
         wandering.home = navi.home?.let { it.latitude to it.longitude }
         wandering.routeActive = navi.routeActive
         drivingFragment()?.setDetectionActive(!wandering.suppressedAt(lat, lon))
         val reason = wandering.onLocation(lat, lon, timeMs) ?: return
-        Log.i(TAG, "Wandering detected: $reason at $lat, $lon")
+        Log.i(TAG, "Wandering detected: $reason at ${logCoords(lat, lon)}")
         driveLog.wandering()
         askRouteHome()
     }

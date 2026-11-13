@@ -17,6 +17,7 @@ import android.os.Looper
 import android.util.Log
 import com.ansimdrive.pleos.BuildConfig
 import com.ansimdrive.pleos.TAG
+import com.ansimdrive.pleos.logCoords
 
 /**
  * Pleos NaviHelper: 집 좌표(HOME 북마크), 현재 위치, 경로 안내 상태, 경로 요청.
@@ -68,7 +69,7 @@ class NaviHelperRepo(context: Context) : NaviHelperEventListener {
                 return false
             }
         }
-        Log.i(TAG, "requestRoute home (${route.latitude}, ${route.longitude})")
+        Log.i(TAG, "requestRoute home (${logCoords(route.latitude, route.longitude)})")
         return ready && call("requestRoute") { helper.requestRoute(route) }
     }
 
@@ -100,7 +101,7 @@ class NaviHelperRepo(context: Context) : NaviHelperEventListener {
         }
         main.post {
             home = h
-            Log.i(TAG, "NaviHelper ok: ${bookmarkInfoList.size} bookmarks, home=${h?.let { "${it.latitude},${it.longitude}" }}")
+            Log.i(TAG, "NaviHelper ok: ${bookmarkInfoList.size} bookmarks, home=${h?.let { logCoords(it.latitude, it.longitude) }}")
         }
     }
 
