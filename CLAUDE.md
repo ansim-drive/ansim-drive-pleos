@@ -1,4 +1,4 @@
-# CLAUDE.md — 안심 드라이브 (Pleos Connect 앱)
+# CLAUDE.md — 님과 함께 (Pleos Connect 앱)
 
 이 파일은 Claude Code가 이 저장소에서 작업할 때 항상 따라야 하는 규칙이다. 사용자는 Android/Kotlin 경험이 거의 없고 최종 확인만 한다. 그러므로 **설명은 짧게, 실행은 끝까지, 검증은 스스로** 한다.
 
