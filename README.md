@@ -50,7 +50,7 @@ adb logcat -s AnsimDrive
 
 ## 릴리스 APK
 
-`apk/둠_님과함께_release.apk`는 **데모 좌표 재생 빌드**입니다 (`-PdemoMode=true -PsttEngine=system`). 실제 위치 대신 데모 좌표를 재생하고, 음성 인식은 Android 표준 인식(에뮬레이터에서는 결과가 오지 않아 버튼으로 대답)입니다. 녹음 음성 파일은 넣지 않았으므로 질문은 화면 문구와 버튼으로 나옵니다.
+`apk/둠_님과함께_release.apk`는 **데모 좌표 재생 빌드**입니다 (`-PdemoMode=true -PsttEngine=system`). 실제 위치 대신 데모 좌표를 재생하고, 음성 인식은 Android 표준 인식(에뮬레이터에서는 결과가 오지 않아 버튼으로 대답)입니다. 녹음 음성 파일은 넣지 않았으므로 질문은 화면 문구와 버튼으로, 출발 전 한마디와 대답 뒤 문장은 화면 아래 자막(6초)으로 나옵니다.
 
 ```bash
 ./gradlew clean assembleRelease -PdemoMode=true -PsttEngine=system
@@ -133,7 +133,7 @@ docs/day2-stt.md               STT 재시도 기록
 
 ## 알려진 제한
 
-- **TTS 미연동**: Pleos 에뮬레이터의 TTS 엔진이 Android 표준 `TextToSpeech`로 검색되지 않아 시스템 음성으로 말하지 못합니다. 녹음 음성이 있으면 녹음을, 없으면 화면 문구만 보여 줍니다. ([재현 정리](docs/pleos-support-tts.md))
+- **TTS 미연동**: Pleos 에뮬레이터의 TTS 엔진이 Android 표준 `TextToSpeech`로 검색되지 않아 시스템 음성으로 말하지 못합니다. 녹음 음성이 있으면 녹음을, 없으면 같은 문장을 화면 문구·자막으로 보여 줍니다. ([재현 정리](docs/pleos-support-tts.md))
 - **집 주소 수동 등록**: 지도 앱에 집을 직접 등록해야 집 경로를 요청합니다. 등록하지 않으면 "집 주소가 아직 없어요"라고 안내합니다. (데모 빌드는 가상의 집 좌표를 씁니다.)
 - **권한은 P에서 먼저 실행**: 주행 중(D)에는 시스템 권한 창이 차단되므로, 첫 실행은 기어 P에서 해서 속도·위치·마이크 권한을 허용해야 합니다.
 - **시연용 안내 음성 미포함**: 시연용 안내 음성은 macOS 음성 합성으로 만든 임시 파일로 배포용이 아니어서 저장소와 공개 APK에 넣지 않음. APK에서는 같은 문장을 화면 문구로 안내. 실차에서는 Pleos TTS SDK 사용. (생성: `scripts/gen_voice.sh`, 로컬 빌드 때 넣는 방법: [docs/voice-lines.md](docs/voice-lines.md))

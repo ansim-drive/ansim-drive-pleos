@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         navi = NaviHelperRepo(this)
         location = if (BuildConfig.DEMO_MODE) DemoLocationSource(this) else AutoLocationSource(this, navi)
         voice = VoiceAssistant(this, VoiceSettings(this))
+        voice.onTextOnly = ::showCaption
         settings = AppSettings(this)
         driveLog = DriveLog(this)
         // 전주 비교 확인용(디버그 빌드만): --ez debug_seed_last_week true
@@ -297,6 +298,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---- 기타 ----
+
+    /** 소리를 못 낼 때 같은 문장을 주행 화면에 자막으로. 질문은 질문 화면에 이미 보이므로 뺀다. */
+    private fun showCaption(line: VoiceLine) {
+        if (line == VoiceLine.ASK_ROUTE_HOME) return
+        supportFragmentManager.executePendingTransactions()   // 출발 직후엔 주행 화면이 아직 붙기 전일 수 있다
+        drivingFragment()?.showCaption(getString(line.text))
+    }
 
     private fun drivingFragment() = supportFragmentManager.findFragmentById(R.id.container) as? DrivingFragment
 

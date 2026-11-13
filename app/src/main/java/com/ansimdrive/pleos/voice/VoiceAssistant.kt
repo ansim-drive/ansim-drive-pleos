@@ -20,7 +20,7 @@ import java.util.Locale
  * (Pleos TTS/STT SDK는 1차 범위에서 사용하지 않는다.)
  *
  * 말하기 우선순위는 [VoiceSettings.mode]를 따른다. TTS 엔진이 없으면(Pleos 에뮬레이터)
- * 녹음 음성(res/raw)을 재생하고, 녹음도 없으면 소리 없이 넘어간다(화면 문구만).
+ * 녹음 음성(res/raw)을 재생하고, 녹음도 없으면 소리 없이 [onTextOnly]로 알린다(화면 자막).
  *
  * 듣기 엔진은 BuildConfig.STT_ENGINE으로 고른다: "vosk"(에뮬레이터용, 기기 내 인식) / "system"(실차용).
  * Vosk 모델이 assets에 없으면 system으로 대신한다.
@@ -30,6 +30,10 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
     enum class Answer { YES, NO, UNKNOWN }
 
     private val main = Handler(Looper.getMainLooper())
+
+    /** TTS도 녹음도 없어 소리를 못 낼 때 불린다. 화면에 같은 문장을 보이는 데 쓴다. */
+    var onTextOnly: (VoiceLine) -> Unit = {}
+
     private var ttsReady = false
     private val stt: SpeechInput =
         if (BuildConfig.STT_ENGINE == "vosk" && VoskSpeechInput.isModelBundled(context)) {
@@ -81,6 +85,7 @@ class VoiceAssistant(private val context: Context, private val settings: VoiceSe
             ttsReady -> speakTts(context.getString(line.text), onDone)
             else -> {
                 Log.w(TAG, "No TTS engine and no res/raw/${line.rawName}: text only")
+                onTextOnly(line)
                 main.post(onDone)
             }
         }

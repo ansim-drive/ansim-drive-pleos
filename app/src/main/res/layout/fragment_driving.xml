@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 주행 중: 검정 배경에 "운전 중" 한 줄 + 작은 헤맴 감지 상태 아이콘. 질문할 때는 위 절반에 문구, 아래 절반에 버튼. -->
+<!-- 주행 중: 검정 배경에 "운전 중" 한 줄 + 작은 헤맴 감지 상태 아이콘. 질문할 때는 위 절반에 문구, 아래 절반에 버튼.
+     음성을 낼 수 없을 때는 아래쪽에 같은 문장을 자막으로 잠깐 보인다. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,6 +25,18 @@
         android:contentDescription="@string/detection_off"
         android:src="@drawable/ic_detection"
         android:tint="@color/detection_off" />
+
+    <TextView
+        android:id="@+id/caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="48dp"
+        android:gravity="center"
+        android:textColor="@color/text_main"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/questionPanel"
