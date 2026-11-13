@@ -1,7 +1,14 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+}
+
+// release 서명: 저장소 루트의 keystore.properties(커밋 금지). 없으면 서명 없는 release가 만들어진다.
+val keystoreProps = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
 android {
@@ -31,12 +38,21 @@ android {
     // 음성 인식 엔진: vosk(기기 내 인식, 에뮬레이터용) / system(Android SpeechRecognizer, 실차용). -PsttEngine=...
     // 문자열 상수는 증분 빌드에서 인라인된 옛 값이 남으므로 String.valueOf로 감싼다.
     val sttEngine = project.findProperty("sttEngine")?.toString()
+    signingConfigs {
+        if (keystoreProps.isNotEmpty()) create("release") {
+            storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+            storePassword = keystoreProps.getProperty("storePassword")
+            keyAlias = keystoreProps.getProperty("keyAlias")
+            keyPassword = keystoreProps.getProperty("keyPassword")
+        }
+    }
     buildTypes {
         debug {
             buildConfigField("String", "STT_ENGINE", "String.valueOf(\"${sttEngine ?: "vosk"}\")")
         }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release")
             buildConfigField("String", "STT_ENGINE", "String.valueOf(\"${sttEngine ?: "system"}\")")
         }
     }
@@ -51,6 +67,18 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+}
+
+// system 엔진 빌드는 Vosk를 쓰지 않으므로 모델(약 250MB)과 네이티브 라이브러리(약 40MB)를 APK에서 뺀다.
+androidComponents {
+    val sttEngine = project.findProperty("sttEngine")?.toString()
+    onVariants { variant ->
+        val engine = sttEngine ?: if (variant.buildType == "release") "system" else "vosk"
+        if (engine == "system") {
+            variant.androidResources.ignoreAssetsPatterns.add("!<dir>vosk-model-ko")
+            variant.packaging.jniLibs.excludes.add("**/libvosk.so")
+        }
     }
 }
 

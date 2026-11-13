@@ -7,7 +7,7 @@
   adb install -r "apk/둠_님과함께_release.apk"
   adb shell am start -n com.ansimdrive.pleos/.MainActivity
   ```
-- **APK 위치**: [`apk/둠_님과함께_release.apk`](apk/둠_님과함께_release.apk)
+- **APK 위치**: [`apk/둠_님과함께_release.apk`](apk/둠_님과함께_release.apk) — **이 APK는 데모 좌표 재생 빌드**입니다. 실제 위치 대신 `assets/demo_route.json` 좌표를 1초 간격으로 재생해, 에뮬레이터에서 운전하지 않아도 기어 D 후 약 17초 뒤 헤맴 감지를 볼 수 있습니다. 대답은 화면의 큰 **네 / 아니요** 버튼으로 합니다. (빌드 옵션: [릴리스 APK](#릴리스-apk))
 
 ## 소개
 
@@ -44,7 +44,27 @@ adb logcat -s AnsimDrive
 - 기어·속도·브레이크는 Virtual Console(`adb forward tcp:8088 tcp:8088` → http://127.0.0.1:8088/)에서 바꿉니다.
 - 단위 테스트: `./gradlew testDebugUnitTest` (geohash, 헤맴 감지, 데모 경로 트리거 시간)
 - 음성만 빠르게 확인(디버그 빌드): `adb shell am start -S -n com.ansimdrive.pleos/.MainActivity --ez debug_ask true`
-- 음성 인식 엔진: debug 빌드는 기기 내 Vosk(모델 별도 설치, [docs/voice-lines.md](docs/voice-lines.md)), release는 Android 표준 인식. `-PsttEngine=vosk|system`으로 바꿀 수 있습니다.
+- 음성 인식 엔진: debug 빌드는 기기 내 Vosk(모델 별도 설치, [docs/voice-lines.md](docs/voice-lines.md)), release는 Android 표준 인식. `-PsttEngine=vosk|system`으로 바꿀 수 있습니다. system 엔진 빌드에는 Vosk 모델·라이브러리를 넣지 않습니다.
+
+## 릴리스 APK
+
+`apk/둠_님과함께_release.apk`는 **데모 좌표 재생 빌드**입니다 (`-PdemoMode=true -PsttEngine=system`). 실제 위치 대신 데모 좌표를 재생하고, 음성 인식은 Android 표준 인식(에뮬레이터에서는 결과가 오지 않아 버튼으로 대답)입니다. 녹음 음성 파일은 넣지 않았으므로 질문은 화면 문구와 버튼으로 나옵니다.
+
+```bash
+./gradlew clean assembleRelease -PdemoMode=true -PsttEngine=system
+cp app/build/outputs/apk/release/app-release.apk "apk/둠_님과함께_release.apk"
+```
+
+서명 정보는 저장소 루트의 `keystore.properties`(커밋하지 않음)에서 읽습니다. 파일이 없으면 서명 없는 APK가 만들어집니다.
+
+```properties
+storeFile=release.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+debug 빌드가 설치된 에뮬레이터에는 서명이 달라 덮어쓸 수 없으니 먼저 `adb uninstall com.ansimdrive.pleos`를 실행합니다.
 
 ## 녹음 음성 안내
 
