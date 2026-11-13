@@ -16,7 +16,7 @@ object DetectionConfig {
     const val HOME_RADIUS_M = 500.0
     const val COOLDOWN_MS = 15 * 60 * 1000L       // 트리거 후 재트리거 금지
 
-    // 급제동 (eTAS 기준 준용)
+    // 급제동: eTAS 위험운전행동 정의 중 급제동(브레이크 사용 중 초당 11km/h 이상 감속)을 참고
     const val HARD_BRAKE_KMH_PER_SEC = 11f
     const val HARD_BRAKE_COOLDOWN_MS = 3_000L
 

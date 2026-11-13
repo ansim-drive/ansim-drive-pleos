@@ -69,7 +69,7 @@ SDK 의존성 추가 방법(Maven 저장소 URL, artifact 좌표)은 위 튜토�
 
 ## 7. 급제동·야간 정의 (기록 기능, 1차는 로그만)
 
-- 급제동: 한국교통안전공단 eTAS 기준 준용 — 브레이크 ON 상태에서 초당 11km/h 이상 감속. 속도는 `PERF_VEHICLE_SPEED`(m/s → ×3.6), 브레이크는 Vehicle SDK Brake API
+- 급제동: 한국교통안전공단 eTAS 위험운전행동 정의 중 급제동(브레이크 사용 중 초당 11km/h 이상 감속)을 참고. 속도는 `PERF_VEHICLE_SPEED`(m/s → ×3.6), 브레이크는 Vehicle SDK Brake API
 - 야간: Vehicle SDK Light API 헤드라이트 ON. 미지원이면 시각(일몰~일출 근사)
 
 ## 8. 코드 구조

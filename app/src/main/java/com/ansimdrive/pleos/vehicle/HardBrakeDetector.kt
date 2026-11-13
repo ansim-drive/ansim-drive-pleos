@@ -3,7 +3,7 @@ package com.ansimdrive.pleos.vehicle
 import com.ansimdrive.pleos.detection.DetectionConfig
 
 /**
- * 급제동: 브레이크 ON 상태에서 초당 11km/h 이상 감속 (eTAS 기준 준용).
+ * 급제동: eTAS 위험운전행동 정의 중 급제동(브레이크 사용 중 초당 11km/h 이상 감속)을 참고.
  * 약 1초 간격으로 속도 차이를 본다. 같은 제동을 여러 번 세지 않도록 쿨다운을 둔다.
  */
 class HardBrakeDetector {

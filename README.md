@@ -81,7 +81,7 @@ app/src/main/java/com/ansimdrive/pleos/
   ui/ParkedFragment.kt         정차 중 큰 글씨 요약
   vehicle/CarPropertyRepo.kt   AAOS Car API: 속도·기어
   vehicle/PleosVehicleRepo.kt  Pleos Vehicle SDK: 브레이크·로우빔
-  vehicle/HardBrakeDetector.kt 급제동 (브레이크 ON + 초당 11km/h 이상 감속)
+  vehicle/HardBrakeDetector.kt 급제동 (eTAS 위험운전행동 정의 중 급제동(브레이크 사용 중 초당 11km/h 이상 감속)을 참고)
   location/LocationSource.kt   NaviHelper / LocationManager / 데모 위치 소스
   detection/                   Geohash, WanderingDetector, DetectionConfig(임계값 모음)
   voice/VoiceAssistant.kt      TTS·녹음 재생, 대답 판정
